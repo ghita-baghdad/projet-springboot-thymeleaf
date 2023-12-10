@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Machine</title>
+    <style>/* Style for the body */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 20px;
+        }
+        
+        /* Style for the header */
+        h1 {
+            color: #009688;
+        }
+        
+        /* Style for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        /* Style for table headers */
+        th {
+            background-color: #009688;
+            color: #fff;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        /* Style for table cells */
+        td {
+            padding: 8px;
+        }
+        
+        /* Style for form */
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Style for form labels */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        /* Style for form input fields */
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        
+        /* Style for the submit button */
+        button {
+            background-color: #009688;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+       /* Style for links */
+a {
+    display: inline-block;
+    text-decoration: none;
+    color: #f4f4f4;
+    background-color: #009688;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Style for links on hover */
+a:hover {
+    text-decoration: underline;
+    color: #0056b3;
+    background-color: #00796b;
+}
+
+/* Center the button vertically */
+a span {
+    display: flex;
+    align-items: center;
+}
+
+        </style>
+</head>
+
+<body>
+
+    <h2>Edit Machine</h2>
+
+    <form action="@{/machines/update/{id}(id=${machine.id})}" method="post" th:object="${machine}" th:action="@{/machines/update/{id}(id=${machine.id})}">
+        <label for="reference">Reference:</label>
+        <input type="text" id="reference" th:field="*{reference}" />
+
+        <label for="marque">Marque:</label>
+        <input type="text" id="marque" th:field="*{marque}" />
+
+        <label for="dateAchat">Date Achat:</label>
+        <input type="date" id="dateAchat" th:field="*{dateAchat}" />
+
+        <label for="prix">Prix:</label>
+        <input type="text" id="prix" th:field="*{prix}" />
+
+        <label for="employe">Select Employe:</label>
+        <select id="employe" th:field="*{employe.id}" class="form-control">
+            <option th:each="employee : ${employes}" th:value="${employee.id}"
+                th:text="${employee.nom + ' ' + employee.prenom}" th:selected="${employee.id eq machine.employe.id}"></option>
+        </select>
+
+        <button type="submit">Save</button>
+    </form>
+
+    <a th:href="@{/machines}">Back to Machine List</a>
+
+</body>
+
+</html>

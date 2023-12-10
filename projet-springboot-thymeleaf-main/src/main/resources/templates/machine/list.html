@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Machine List</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>/* Style for the body */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 20px;
+        }
+        
+        /* Style for the header */
+        h1 {
+            color: #009688;
+        }
+        
+        /* Style for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        /* Style for table headers */
+        th {
+            background-color: #009688;
+            color: #fff;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        /* Style for table cells */
+        td {
+            padding: 8px;
+        }
+        
+        /* Style for form */
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Style for form labels */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        /* Style for form input fields */
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        
+        /* Style for the submit button */
+        button {
+            background-color: #009688;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+       /* Style for links */
+a {
+    display: inline-block;
+    text-decoration: none;
+    color: #f4f4f4;
+    background-color: #009688;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Style for links on hover */
+a:hover {
+    text-decoration: underline;
+    color: #0056b3;
+    background-color: #00796b;
+}
+
+/* Center the button vertically */
+a span {
+    display: flex;
+    align-items: center;
+}
+
+        </style>
+</head>
+
+<body>
+    <h1>Machine List</h1>
+
+    <!-- Filter by Employé Form -->
+    <form action="/machines/filtres" method="get">
+        <label for="employeId">Filtrer par Employé:</label>
+        <select id="employeId" name="employeId" class="form-control">
+            <option value="">Tous les employés</option>
+            <option th:each="employee : ${employes}" th:value="${employee.id}"
+                th:text="${employee.nom + ' ' + employee.prenom}"></option>
+        </select>
+        <button type="submit">Filtrer</button>
+    </form>
+
+    <!-- Sorting by Date Form -->
+    <form action="/machines/sortByDate" method="get">
+        <label for="sortOrder">Trier par Date:</label>
+        <select id="sortOrder" name="sortOrder" class="form-control">
+            <option value="asc">Ascendant</option>
+            <option value="desc">Descendant</option>
+        </select>
+        <button type="submit">Trier</button>
+    </form>
+
+
+
+
+    <table>
+        <!-- Table headers -->
+        <tr>
+            <th>ID</th>
+            <th>Reference</th>
+            <th>Marque</th>
+            <th>Date Achat</th>
+            <th>Prix</th>
+            <th>Employe</th>
+            <th>Actions</th>
+        </tr>
+
+        <!-- Table rows -->
+        <tr th:each="machine : ${machines}">
+            <td th:text="${machine.id}"></td>
+            <td th:text="${machine.reference}"></td>
+            <td th:text="${machine.marque}"></td>
+            <td th:text="${machine.dateAchat}"></td>
+            <td th:text="${machine.prix}"></td>
+            <td th:text="${machine.employe.nom + ' ' + machine.employe.prenom}"></td>
+            <td>
+                <a th:href="@{/machines/edit/{id}(id=${machine.id})}">Edit</a>
+                <a th:href="@{/machines/delete/{id}(id=${machine.id})}">Delete</a>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Create Machine and Back to Home links -->
+    <a th:href="@{/machines/create}">Create Machine</a>
+    <a th:href="@{/}">Back to Home</a>
+
+    <h1>Graphe des machines acquises par année </h1>
+    <canvas id="acquiredMachinesChart" width="400" height="200"></canvas>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var machines = /*[[${machines}]]*/[];
+
+        if (machines.length > 0) {
+            // Extract years and count machines per year
+            var dataByYear = {};
+            machines.forEach(function (machine) {
+                var year = new Date(machine.dateAchat).getFullYear().toString();
+                dataByYear[year] = (dataByYear[year] || 0) + 1;
+            });
+
+            // Create arrays for chart labels and data
+            var labels = Object.keys(dataByYear);
+            var data = Object.values(dataByYear);
+
+            // Get the canvas element
+            var ctx = document.getElementById('acquiredMachinesChart').getContext('2d');
+
+            // Create the chart
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Machines Acquired Per Year',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } else {
+            console.log("Machines Data is empty.");
+        }
+        /*]]>*/
+    </script>
+</body>
+
+</html>
